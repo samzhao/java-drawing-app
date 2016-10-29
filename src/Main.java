@@ -9,22 +9,22 @@ public class Main {
     static final int windowWidth = 600;
     static final int windowHeight = 500;
 
-    JFrame window = new JFrame("SwingDraw");
-    JPanel container = new JPanel(new BorderLayout());
-    JPanel controlPanel = new JPanel();
-
-    public Main() {
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.getContentPane().add(container);
-        window.pack();
-
-        container.add(controlPanel, BorderLayout.PAGE_START);
-
-        window.setSize(windowWidth, windowHeight);
-        window.setVisible(true);
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Main::run);
     }
 
-    public static void main(String[] args) {
-        new Main();
+    public static void run() {
+        JFrame frame = new JFrame("SwingDraw");
+        Container container = frame.getContentPane();
+
+        ControlPanel cp = new ControlPanel();
+        DrawingPanel dp = new DrawingPanel();
+
+        container.add(dp);
+        container.add(cp, BorderLayout.NORTH);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 }
