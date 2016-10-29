@@ -8,23 +8,26 @@ import java.util.ArrayList;
  * Created by samz on 2016-10-29.
  */
 class ControlPanel extends JPanel implements ActionListener {
+    State state = State.getInstance();
+
     private Color panelBg = Color.lightGray;
 
-    private ArrayList<MyButton> controls = new ArrayList();
+    private ArrayList<MyButton> colorControls = new ArrayList();
     MyButton resetBtn = createBtn("Reset");
 
     public ControlPanel() {
-        controls.add(createBtn(Color.BLACK));
-        controls.add(createBtn(Color.RED));
-        controls.add(createBtn(Color.GREEN));
-        controls.add(createBtn(Color.BLUE));
+        state.subscribe(onStateChange());
 
-        for (MyButton btn : controls) {
+        for (Constants.COLORS color : Constants.COLORS.values()) {
+            colorControls.add(createBtn(color.getColor()));
+        }
+
+        for (MyButton btn : colorControls) {
             add(btn);
         }
 
         // set default selected color
-        controls.get(0).setActive();
+        selectColor(colorControls.get(0).getBackground());
 
         resetBtn.setCanBeActive(false);
         add(resetBtn);
@@ -45,17 +48,42 @@ class ControlPanel extends JPanel implements ActionListener {
         return btn;
     }
 
+    private void selectColor(Color btnBg) {
+        Constants.COLORS color = Constants.COLORS.valueOf(btnBg);
+        Event event = new Event(Constants.EVENTS.SET_ACTIVE_COLOR, color);
+        state.dispatch(event);
+    }
+
+    private State.Subscriber onStateChange() {
+        return event -> {
+            switch(event.type) {
+                case SET_ACTIVE_COLOR:
+                    for (MyButton btn : colorControls) {
+                        btn.setInactive();
+
+                        if (Constants.COLORS.valueOf(btn.getBackground()) == event.payload) {
+                            btn.setActive();
+                        }
+                    }
+                    break;
+            }
+        };
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         MyButton clickedBtn = (MyButton) e.getSource();
 
         if (clickedBtn == resetBtn) {
+            Event event = new Event(Constants.EVENTS.RESET_CANVAS);
+            state.dispatch(event);
+
             return;
         }
 
-        for (MyButton btn : controls) {
-            btn.setInactive();
+        if (colorControls.contains(clickedBtn)) {
+            selectColor(clickedBtn.getBackground());
+            return;
         }
-        clickedBtn.setActive();
     }
 }

@@ -5,15 +5,10 @@ import java.awt.*;
  * Created by samz on 2016-10-29.
  */
 public class Main {
-    Canvas canvas;
     static final int windowWidth = 600;
     static final int windowHeight = 500;
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(Main::run);
-    }
-
-    public static void run() {
+    public Main() {
         JFrame frame = new JFrame("SwingDraw");
         Container container = frame.getContentPane();
 
@@ -26,5 +21,9 @@ public class Main {
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(Main::new);
     }
 }
