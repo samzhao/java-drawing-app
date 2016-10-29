@@ -21,10 +21,7 @@ public class MyButton extends JButton {
         this.setOpaque(true);
         this.setMinimumSize(new Dimension(btnWidth, btnHeight));
         this.setPreferredSize(new Dimension(btnWidth, btnHeight));
-        this.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(parentBackground, 3),
-                BorderFactory.createLineBorder(this.getBackground(), 3)
-        ));
+        setInactiveBorder();
     }
 
     public void setCanBeActive(Boolean canBeActive) {
@@ -44,17 +41,25 @@ public class MyButton extends JButton {
         this.isActive = isActive;
 
         if (isActive) {
-            this.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(this.getBackground(), 3),
-                    BorderFactory.createLineBorder(this.getBackground(), 3)
-            ));
+            setActiveBorder();
         } else {
-            this.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(parentBackground, 3),
-                    BorderFactory.createLineBorder(this.getBackground(), 3)
-            ));
+            setInactiveBorder();
         }
 
         repaint();
+    }
+
+    private void setActiveBorder() {
+        this.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(this.getBackground(), 5),
+                BorderFactory.createLineBorder(this.getBackground(), 3)
+        ));
+    }
+    private void setInactiveBorder() {
+
+        this.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(parentBackground, 3),
+                BorderFactory.createLineBorder(this.getBackground(), 3)
+        ));
     }
 }
