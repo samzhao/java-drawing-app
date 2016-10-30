@@ -5,15 +5,12 @@ import java.awt.*;
  * Created by samz on 2016-10-29.
  */
 public class Main {
-    static final int windowWidth = 600;
-    static final int windowHeight = 500;
-
     public Main() {
         JFrame frame = new JFrame("SwingDraw");
         Container container = frame.getContentPane();
 
-        ControlPanel cp = new ControlPanel();
         DrawingPanel dp = new DrawingPanel();
+        ControlPanel cp = new ControlPanel();
 
         container.add(dp);
         container.add(cp, BorderLayout.NORTH);

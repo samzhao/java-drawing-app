@@ -12,13 +12,20 @@ public class Constants {
     public enum EVENTS {
         RESET_CANVAS,
         SET_ACTIVE_COLOR,
-        SET_ACTIVE_MODE
+        SET_ACTIVE_MODE,
+        ADD_RECT,
+        ADD_TRIG,
+        ADD_LINE,
+        ADD_OVAL
     }
 
     public enum MODES {
         FREEFORM("Free", 0),
-        SHAPES("Shapes", 1),
-        EDIT("Edit", 2);
+        RECT("Rectangle", 1),
+        TRIG("Triangle", 2),
+        LINE("Line", 3),
+        OVAL("Oval", 4),
+        EDIT("Edit", 5);
 
         private final String name;
         private final int value;
@@ -50,10 +57,11 @@ public class Constants {
     }
 
     public enum COLORS {
-        BLACK(Color.BLACK),
-        RED(Color.RED),
-        GREEN(Color.GREEN),
-        BLUE(Color.BLUE);
+        BLACK(new Color(31, 21, 1)),
+        BLUE(new Color(42, 179, 231)),
+        YELLOW(new Color(252, 211, 61)),
+        GREEN(new Color(60, 171, 39)),
+        RED(new Color(210, 39, 109));
 
         private Color color;
         private static Map<Color, COLORS> map = new HashMap<Color, COLORS>() {{

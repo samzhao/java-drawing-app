@@ -97,15 +97,9 @@ class ControlPanel extends JPanel implements ActionListener {
     }
 
     private AppState.Subscriber onStateChange() {
-        return (event, state) -> {
-            switch(event.type) {
-                case SET_ACTIVE_COLOR:
-                    updateColorControls((Constants.COLORS) state.get("ACTIVE_COLOR"));
-                    break;
-                case SET_ACTIVE_MODE:
-                    updateModeControls((Constants.MODES) state.get("ACTIVE_MODE"));
-                    break;
-            }
+        return state -> {
+            updateColorControls((Constants.COLORS) state.get("ACTIVE_COLOR"));
+            updateModeControls((Constants.MODES) state.get("ACTIVE_MODE"));
         };
     }
 

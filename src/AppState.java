@@ -9,8 +9,15 @@ import java.util.Map;
 public class AppState {
     private static AppState defaultInstance;
     private List<Subscriber> subscribers;
+    private Map<String, Object> defaultObjects = new HashMap() {{
+        put("RECTS", new ArrayList<>());
+        put("TRIGS", new ArrayList<>());
+        put("LINES", new ArrayList<>());
+        put("OVALS", new ArrayList<>());
+    }};
     private Map<String, Object> state = new HashMap(){{
-        put("ACTIVE_COLOR", Constants.COLORS.BLACK);
+        put("OBJECTS", defaultObjects);
+        put("ACTIVE_COLOR", Constants.COLORS.values()[0]);
         put("ACTIVE_MODE", Constants.MODES.FREEFORM);
     }};
 
@@ -29,19 +36,34 @@ public class AppState {
         updateState(event);
 
         for (Subscriber subscriber : subscribers) {
-            subscriber.onEvent(event, state);
+            subscriber.onEvent(state);
         }
     }
 
     private void updateState(Event event) {
         switch (event.type) {
             case RESET_CANVAS:
+                Map objects = (Map) state.get("OBJECTS");
+                ArrayList rects = (ArrayList) objects.get("RECTS");
+                ArrayList trigs = (ArrayList) objects.get("TRIGS");
+                ArrayList lines = (ArrayList) objects.get("LINES");
+                ArrayList ovals = (ArrayList) objects.get("OVALS");
+
+                rects.clear();
+                trigs.clear();
+                lines.clear();
+                ovals.clear();
                 break;
             case SET_ACTIVE_COLOR:
                 state.put("ACTIVE_COLOR", event.payload);
                 break;
             case SET_ACTIVE_MODE:
                 state.put("ACTIVE_MODE", event.payload);
+                break;
+            case ADD_RECT:
+                objects = (Map) state.get("OBJECTS");
+                rects = (ArrayList) objects.get("RECTS");
+                rects.add(event.payload);
                 break;
         }
     }
@@ -57,7 +79,7 @@ public class AppState {
     }
 
     public interface Subscriber {
-        void onEvent(Event event, Map state);
+        void onEvent(Map state);
     }
 
     public Map getState() {
