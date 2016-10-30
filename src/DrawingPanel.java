@@ -47,16 +47,29 @@ public class DrawingPanel extends JPanel {
         super.paintComponent(g);
 
         Color foreground = g.getColor();
-
+        Graphics2D g2d = (Graphics2D) g;
+//
         for (Object rect : this.rects) {
-            g.setColor(((ColoredRect) rect).getBackground());
             Rectangle r = ((ColoredRect) rect).getRect();
+            g.setColor(((ColoredRect) rect).getBackground());
             g.drawRect(r.x, r.y, r.width, r.height);
             g.fillRect(r.x, r.y, r.width, r.height);
+
+            if (((ColoredRect) rect).isActive()) {
+                g.setColor(Constants.SELECTION_COLOR);
+                ((Graphics2D) g).setStroke(new BasicStroke(Constants.SELECTION_STROKE_WIDTH));
+                g.drawRect(
+                        r.x-Constants.SELECTION_STROKE_WIDTH,
+                        r.y-Constants.SELECTION_STROKE_WIDTH,
+                        r.width+Constants.SELECTION_STROKE_WIDTH*2,
+                        r.height+Constants.SELECTION_STROKE_WIDTH*2
+                );
+                ((Graphics2D) g).setStroke(new BasicStroke(1));
+                g.setColor(foreground);
+            }
         }
 
         if (currentShape != null) {
-            Graphics2D g2d = (Graphics2D) g;
             g2d.setColor(foreground);
             g2d.draw(currentShape);
             g2d.fill(currentShape);
@@ -72,11 +85,12 @@ public class DrawingPanel extends JPanel {
 
     class MyMouseListener extends MouseInputAdapter {
         private Point startPoint;
+        private ColoredRect selectedRect = null;
 
         public void mousePressed(MouseEvent e) {
             startPoint = e.getPoint();
 
-            switch(currentMode) {
+            switch (currentMode) {
                 case RECT:
                     currentShape = new Rectangle();
                     break;
@@ -89,6 +103,17 @@ public class DrawingPanel extends JPanel {
                 case OVAL:
                     currentShape = (Shape) new Circle();
                     break;
+                case EDIT:
+                    selectedRect = null;
+                    for (Object rect : rects) {
+                        if (((ColoredRect) rect).isIn(startPoint)) {
+                            selectedRect = (ColoredRect) rect;
+                        }
+                    }
+
+                    Event event = new Event(Constants.EVENTS.SET_ACTIVE_RECT, selectedRect);
+                    appState.dispatch(event);
+                    break;
             }
         }
 
@@ -98,7 +123,7 @@ public class DrawingPanel extends JPanel {
             int width = Math.abs(startPoint.x - e.getX());
             int height = Math.abs(startPoint.y - e.getY());
 
-            switch(currentMode) {
+            switch (currentMode) {
                 case RECT:
                     ((Rectangle) currentShape).setBounds(x, y, width, height);
                     break;
@@ -110,6 +135,16 @@ public class DrawingPanel extends JPanel {
                     break;
                 case OVAL:
                     currentShape = (Shape) new Circle();
+                    break;
+                case EDIT:
+                    if (selectedRect == null) break;
+
+                    int dx = (int) (e.getX() - selectedRect.getRect().getX());
+                    int dy = (int) (e.getY() - selectedRect.getRect().getY());
+
+                    selectedRect.setLocation(e.getX() - dx, e.getY() - dy);
+                    Event event = new Event(Constants.EVENTS.UPDATE_RECT, selectedRect);
+                    appState.dispatch(event);
                     break;
             }
 
@@ -125,7 +160,7 @@ public class DrawingPanel extends JPanel {
                 return;
             }
 
-            switch(currentMode) {
+            switch (currentMode) {
                 case RECT:
                     addRect((Rectangle) currentShape, e.getComponent().getForeground());
                     break;

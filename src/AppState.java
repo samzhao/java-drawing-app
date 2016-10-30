@@ -41,29 +41,63 @@ public class AppState {
     }
 
     private void updateState(Event event) {
+        Map objects = (Map) state.get("OBJECTS");
+        ArrayList rects = (ArrayList) objects.get("RECTS");
+        ArrayList trigs = (ArrayList) objects.get("TRIGS");
+        ArrayList lines = (ArrayList) objects.get("LINES");
+        ArrayList ovals = (ArrayList) objects.get("OVALS");
+
+        Object payload = event.payload;
+
         switch (event.type) {
             case RESET_CANVAS:
-                Map objects = (Map) state.get("OBJECTS");
-                ArrayList rects = (ArrayList) objects.get("RECTS");
-                ArrayList trigs = (ArrayList) objects.get("TRIGS");
-                ArrayList lines = (ArrayList) objects.get("LINES");
-                ArrayList ovals = (ArrayList) objects.get("OVALS");
-
                 rects.clear();
                 trigs.clear();
                 lines.clear();
                 ovals.clear();
                 break;
             case SET_ACTIVE_COLOR:
-                state.put("ACTIVE_COLOR", event.payload);
+                state.put("ACTIVE_COLOR", payload);
                 break;
             case SET_ACTIVE_MODE:
-                state.put("ACTIVE_MODE", event.payload);
+                state.put("ACTIVE_MODE", payload);
                 break;
             case ADD_RECT:
-                objects = (Map) state.get("OBJECTS");
-                rects = (ArrayList) objects.get("RECTS");
                 rects.add(event.payload);
+                break;
+            case SET_ACTIVE_RECT:
+                int selectedRectIndex = -1;
+
+                for(int i = 0; i < rects.size(); i++) {
+                    ColoredRect rect = (ColoredRect) rects.get(i);
+                    rect.setInactive();
+
+                    if (rects.contains(payload)) {
+                        if (rect.getRect() == ((ColoredRect) payload).getRect()) {
+                            selectedRectIndex = i;
+                        }
+                    }
+                }
+
+                if (selectedRectIndex > -1) {
+                    ColoredRect rect = (ColoredRect) rects.get(selectedRectIndex);
+                    rect.setActive();
+                }
+
+                break;
+            case UPDATE_RECT:
+                ColoredRect selectedRect = null;
+
+                for (Object rect : rects) {
+                    if (((ColoredRect) rect).isActive()) {
+                        selectedRect = (ColoredRect) rect;
+                    }
+                }
+
+                if (selectedRect == null) break;
+
+                selectedRect.setLocation(((ColoredRect) payload).getRect().getLocation());
+
                 break;
         }
     }

@@ -9,14 +9,29 @@ import java.util.stream.Collectors;
  * Created by samz on 2016-10-29.
  */
 public class Constants {
+    public final static Color SELECTION_COLOR = new Color(63, 121, 186);
+    public final static int SELECTION_STROKE_WIDTH = 3;
+
     public enum EVENTS {
         RESET_CANVAS,
+
         SET_ACTIVE_COLOR,
         SET_ACTIVE_MODE,
+
         ADD_RECT,
         ADD_TRIG,
         ADD_LINE,
-        ADD_OVAL
+        ADD_OVAL,
+
+        SET_ACTIVE_RECT,
+        SET_ACTIVE_TRIG,
+        SET_ACTIVE_LINE,
+        SET_ACTIVE_OVAL,
+
+        UPDATE_RECT,
+        UPDATE_TRIG,
+        UPDATE_LINE,
+        UPDATE_OVAL,
     }
 
     public enum MODES {
@@ -57,7 +72,7 @@ public class Constants {
     }
 
     public enum COLORS {
-        BLACK(new Color(31, 21, 1)),
+        BLACK(new Color(29, 29, 33)),
         BLUE(new Color(42, 179, 231)),
         YELLOW(new Color(252, 211, 61)),
         GREEN(new Color(60, 171, 39)),
