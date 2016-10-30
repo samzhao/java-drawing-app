@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Created by samz on 2016-10-29.
  */
 class ControlPanel extends JPanel implements ActionListener {
-    State state = State.getInstance();
+    AppState appState = AppState.getInstance();
 
     private Color panelBg = Color.lightGray;
 
@@ -18,7 +18,7 @@ class ControlPanel extends JPanel implements ActionListener {
     MyButton resetBtn = createBtn("Reset");
 
     public ControlPanel() {
-        state.subscribe(onStateChange());
+        appState.subscribe(onStateChange());
 
         setupColorControls();
         setupModeControls();
@@ -69,12 +69,12 @@ class ControlPanel extends JPanel implements ActionListener {
     private void selectColor(Color btnBg) {
         Constants.COLORS color = Constants.COLORS.valueOf(btnBg);
         Event event = new Event(Constants.EVENTS.SET_ACTIVE_COLOR, color);
-        state.dispatch(event);
+        appState.dispatch(event);
     }
     private void selectMode(String btnText) {
         Constants.MODES mode = Constants.MODES.fromName(btnText);
         Event event = new Event(Constants.EVENTS.SET_ACTIVE_MODE, mode);
-        state.dispatch(event);
+        appState.dispatch(event);
     }
 
     private void updateColorControls(Constants.COLORS color) {
@@ -96,14 +96,14 @@ class ControlPanel extends JPanel implements ActionListener {
         }
     }
 
-    private State.Subscriber onStateChange() {
-        return event -> {
+    private AppState.Subscriber onStateChange() {
+        return (event, state) -> {
             switch(event.type) {
                 case SET_ACTIVE_COLOR:
-                    updateColorControls((Constants.COLORS) event.payload);
+                    updateColorControls((Constants.COLORS) state.get("ACTIVE_COLOR"));
                     break;
                 case SET_ACTIVE_MODE:
-                    updateModeControls((Constants.MODES) event.payload);
+                    updateModeControls((Constants.MODES) state.get("ACTIVE_MODE"));
                     break;
             }
         };
@@ -115,7 +115,7 @@ class ControlPanel extends JPanel implements ActionListener {
 
         if (clickedBtn == resetBtn) {
             Event event = new Event(Constants.EVENTS.RESET_CANVAS);
-            state.dispatch(event);
+            appState.dispatch(event);
 
             return;
         }

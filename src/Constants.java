@@ -16,7 +16,7 @@ public class Constants {
     }
 
     public enum MODES {
-        FREEFORM("Free Form", 0),
+        FREEFORM("Free", 0),
         SHAPES("Shapes", 1),
         EDIT("Edit", 2);
 
