@@ -11,7 +11,7 @@ public class ColoredRect extends MyShape {
         shape = new Rectangle();
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics2D g) {
         super.draw(g);
 
         if (g == null) return;
@@ -21,9 +21,9 @@ public class ColoredRect extends MyShape {
 
         if (isActive()) {
             g.setColor(Constants.SELECTION_COLOR);
-            ((Graphics2D) g).setStroke(new BasicStroke(Constants.SELECTION_STROKE_WIDTH));
+            g.setStroke(Constants.SELECTION_STROKE);
             g.drawRect(shape.x, shape.y, shape.width, shape.height);
-            ((Graphics2D) g).setStroke(new BasicStroke(1));
+            g.setStroke(Constants.DEFAULT_STROKE);
         }
     }
 

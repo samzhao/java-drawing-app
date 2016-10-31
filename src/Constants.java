@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 public class Constants {
     public final static Color SELECTION_COLOR = new Color(63, 121, 186);
     public final static int SELECTION_STROKE_WIDTH = 3;
+    public final static BasicStroke DEFAULT_STROKE = new BasicStroke(0);
+    public final static BasicStroke SELECTION_STROKE = new BasicStroke(SELECTION_STROKE_WIDTH, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 
     public enum EVENTS {
         RESET_CANVAS,

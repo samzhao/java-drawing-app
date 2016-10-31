@@ -33,12 +33,15 @@ public class DrawingPanel extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
         Graphics2D g2d = (Graphics2D) g;
+        super.paintComponent(g2d);
+
+        // antialiasing
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
 
         for (MyShape shape : appState.getShapes()) {
-            if (shape != null) shape.draw(g);
+            if (shape != null) shape.draw(g2d);
         }
 
         if (tempShape != null) {

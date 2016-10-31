@@ -43,7 +43,7 @@ public class MyShape implements Cloneable {
         return false;
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics2D g) {
         if (g != null) {
             g.setColor(color);
         }

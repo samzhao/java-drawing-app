@@ -15,7 +15,7 @@ public class ColoredTriangle extends MyShape {
         shape = new Polygon();
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics2D g) {
         super.draw(g);
 
         if (g == null || center == null || p1 == null) return;
@@ -25,9 +25,9 @@ public class ColoredTriangle extends MyShape {
 
         if (isActive()) {
             g.setColor(Constants.SELECTION_COLOR);
-            ((Graphics2D) g).setStroke(new BasicStroke(Constants.SELECTION_STROKE_WIDTH));
+            g.setStroke(Constants.SELECTION_STROKE);
             g.drawPolygon(this.shape);
-            ((Graphics2D) g).setStroke(new BasicStroke(1));
+            g.setStroke(Constants.DEFAULT_STROKE);
         }
     }
 
