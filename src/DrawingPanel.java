@@ -40,31 +40,15 @@ public class DrawingPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Color foreground = g.getColor();
         Graphics2D g2d = (Graphics2D) g;
 
         for (Object rect : appState.getObjects().getRects()) {
             ColoredRect r = ((ColoredRect) rect);
-            g.setColor(r.getBackground());
-            g.drawRect(r.x, r.y, r.width, r.height);
-            g.fillRect(r.x, r.y, r.width, r.height);
-
-            if (r.isActive()) {
-                g.setColor(Constants.SELECTION_COLOR);
-                ((Graphics2D) g).setStroke(new BasicStroke(Constants.SELECTION_STROKE_WIDTH));
-                g.drawRect(
-                        r.x-Constants.SELECTION_STROKE_WIDTH,
-                        r.y-Constants.SELECTION_STROKE_WIDTH,
-                        r.width+Constants.SELECTION_STROKE_WIDTH*2,
-                        r.height+Constants.SELECTION_STROKE_WIDTH*2
-                );
-                ((Graphics2D) g).setStroke(new BasicStroke(1));
-                g.setColor(foreground);
-            }
+            r.draw(g);
         }
 
         if (currentShape != null) {
-            g2d.setColor(foreground);
+            g2d.setColor(appState.getActiveColor().getColor());
             g2d.draw(currentShape);
             g2d.fill(currentShape);
         }
@@ -81,7 +65,7 @@ public class DrawingPanel extends JPanel {
 
             switch (appState.getActiveMode()) {
                 case RECT:
-                    currentShape = new ColoredRect(e.getComponent().getForeground());
+                    currentShape = new ColoredRect(appState.getActiveColor().getColor());
                     break;
                 case TRIG:
                     currentShape = (Shape) new TriangleMesh();
@@ -95,15 +79,15 @@ public class DrawingPanel extends JPanel {
                 case EDIT:
                     selectedRect = null;
                     for (Object rect : appState.getObjects().getRects()) {
-                        if (((ColoredRect) rect).isIn(startPoint)) {
-                            selectedRect = (ColoredRect) ((ColoredRect) rect).clone();
+                        if (((ColoredRect) rect).contains(startPoint)) {
+                            selectedRect = ((ColoredRect) rect).clone();
                         }
                     }
 
                     if (selectedRect != null) {
                         selectedRect.setActive();
-                        lastX = selectedRect.x - e.getX();
-                        lastY = selectedRect.y - e.getY();
+                        lastX = selectedRect.getX() - e.getX();
+                        lastY = selectedRect.getY() - e.getY();
                     }
 
                     Event event = new Event(Constants.EVENTS.UPDATE_RECT, selectedRect);
@@ -191,7 +175,6 @@ public class DrawingPanel extends JPanel {
     }
 
     private void update(AppState newState) {
-        setForeground(newState.getActiveColor().getColor());
         appState = newState;
 
         this.repaint();

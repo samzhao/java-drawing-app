@@ -84,7 +84,7 @@ class ControlPanel extends JPanel implements ActionListener {
         ColoredRect rect = appState.getObjects().getActiveRect();
         if (rect == null) return;
 
-        rect.setBackground(color.getColor());
+        rect.setColor(color.getColor());
 
         Event event = new Event(Constants.EVENTS.CHANGE_COLOR, rect);
         state.dispatch(event);
