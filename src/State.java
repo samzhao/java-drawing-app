@@ -7,14 +7,8 @@ import java.util.List;
 public class State {
     private static State defaultInstance;
     private List<Subscriber> subscribers;
-    private ObjectModel defaultObjects = new ObjectModel(
-            new ArrayList(),
-            new ArrayList(),
-            new ArrayList(),
-            new ArrayList()
-    );
     private AppState state = new AppState(
-            defaultObjects,
+            new ArrayList<MyShape>(),
             Constants.COLORS.values()[0],
             Constants.MODES.values()[0],
             null
@@ -42,75 +36,73 @@ public class State {
     private void updateState(Event event) {
         Object payload = event.payload;
 
-        ObjectModel objects = state.getObjects();
-        ArrayList rects = (ArrayList) objects.getRects().clone();
-        ArrayList trigs = (ArrayList) objects.getTrigs().clone();
-        ArrayList lines = (ArrayList) objects.getLines().clone();
-        ArrayList ovals = (ArrayList) objects.getOvals().clone();
+        ArrayList shapes = (ArrayList) state.getShapes().clone();
+        int activeShapeIndex = state.getActiveShapeIndex();
 
         switch (event.type) {
             case RESET_CANVAS:
-                rects.clear();
-                trigs.clear();
-                lines.clear();
-                ovals.clear();
+                shapes.clear();
 
-                ObjectModel newObjects = new ObjectModel(rects, trigs, lines, ovals);
-                state = new AppState(newObjects, state.getActiveColor(), state.getActiveMode(), null);
+                state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), null);
                 break;
             case SET_ACTIVE_COLOR:
                 Constants.COLORS activeColor = (Constants.COLORS) payload;
-                state = new AppState(state.getObjects(), activeColor, state.getActiveMode(), state.getActiveObject());
+                state = new AppState(state.getShapes(), activeColor, state.getActiveMode(), state.getActiveShapeId());
                 break;
             case SET_ACTIVE_MODE:
                 Constants.MODES activeMode = (Constants.MODES) payload;
-                state = new AppState(state.getObjects(), state.getActiveColor(), activeMode, state.getActiveObject());
+                state = new AppState(state.getShapes(), state.getActiveColor(), activeMode, state.getActiveShapeId());
                 break;
-            case ADD_RECT:
-                rects.add(event.payload);
-
-                newObjects = new ObjectModel(rects, trigs, lines, ovals);
-                state = new AppState(newObjects, state.getActiveColor(), state.getActiveMode(), state.getActiveObject());
+            case ADD_SHAPE:
+                shapes.add(payload);
+                state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), ((MyShape) payload).getId());
                 break;
-            case UPDATE_RECT:
+            case UPDATE_SHAPE:
                 if (payload == null) {
-                    for (Object rect : rects) {
-                        ((ColoredRect) rect).setInactive();
+                    for (Object shape : shapes) {
+                        ((MyShape) shape).setInactive();
                     }
-
                     break;
                 }
 
-                ColoredRect payloadRect = (ColoredRect) payload;
-                int selectedRectIndex = -1;
+                MyShape payloadShape = (MyShape) payload;
+                int selectedShapeIndex = -1;
 
-                for(int i = 0; i < rects.size(); i++) {
-                    ColoredRect rect = (ColoredRect) rects.get(i);
-                    rect.setInactive();
+                MyShape activeShape = null;
 
-                    if (rect.getId() == payloadRect.getId()) {
-                        selectedRectIndex = i;
+                for (int i = 0; i < shapes.size(); i++) {
+                    MyShape shape = (MyShape) shapes.get(i);
+                    shape.setInactive();
+
+                    if (shape.getId() == payloadShape.getId()) {
+                        selectedShapeIndex = i;
                     }
                 }
 
-                if (selectedRectIndex > -1) {
-                    rects.set(selectedRectIndex, payload);
+                if (selectedShapeIndex > -1) {
+                    shapes.set(selectedShapeIndex, payload);
+                    activeShape = (MyShape) shapes.get(selectedShapeIndex);
                 }
 
-                newObjects = new ObjectModel(rects, trigs, lines, ovals);
-                state = new AppState(newObjects, state.getActiveColor(), state.getActiveMode(), state.getActiveObject());
+                state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), activeShape.getId());
                 break;
-
             case CHANGE_COLOR:
-                int activeRectIndex = objects.getActiveRectIndex();
-                rects.set(activeRectIndex, payload);
+                if (activeShapeIndex < 0) return;
 
-                newObjects = new ObjectModel(rects, trigs, lines, ovals);
-                state = new AppState(newObjects, state.getActiveColor(), state.getActiveMode(), state.getActiveObject());
+                shapes.set(activeShapeIndex, payload);
+
+                state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), state.getActiveShapeId());
                 break;
-
             case DELETE_OBJECT:
-                System.out.println("DELET ITEM");
+                System.out.println(activeShapeIndex);
+
+                if (activeShapeIndex < 0) return;
+
+                System.out.println(shapes);
+                shapes.remove(activeShapeIndex);
+                System.out.println(shapes);
+
+                state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), state.getActiveShapeId());
                 break;
         }
     }

@@ -81,12 +81,12 @@ class ControlPanel extends JPanel implements ActionListener {
     private void changeColor(Color btnBg) {
         Constants.COLORS color = Constants.COLORS.valueOf(btnBg);
 
-        ColoredRect rect = appState.getObjects().getActiveRect();
-        if (rect == null) return;
+        MyShape shape = appState.getActiveShape();
+        if (shape == null) return;
 
-        rect.setColor(color.getColor());
+        shape.setColor(color.getColor());
 
-        Event event = new Event(Constants.EVENTS.CHANGE_COLOR, rect);
+        Event event = new Event(Constants.EVENTS.CHANGE_COLOR, shape);
         state.dispatch(event);
     }
 
