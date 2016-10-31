@@ -67,17 +67,17 @@ public class ColoredFreeLine extends MyShape {
         if (lines.size() < 1) return 0;
         return (int) lines.get(0).getY1();
     }
-    public void setLocation(Point center) {
-        int dx = center.x - translateX;
-        int dy = center.y - translateY;
+    public void setLocation(Point p) {
+        int dx = p.x - translateX;
+        int dy = p.y - translateY;
 
         for (Line2D line : lines) {
             Line2D newLine = new Line2D.Double(line.getX1()+dx, line.getY1()+dy, line.getX2()+dx, line.getY2()+dy);
             line.setLine(newLine);
         }
 
-        translateX = center.x;
-        translateY = center.y;
+        translateX = p.x;
+        translateY = p.y;
     }
     public void setBounds(Point startPoint, Point p) {
         if (this.lastPoint == null) {

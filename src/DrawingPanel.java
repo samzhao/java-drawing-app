@@ -70,6 +70,7 @@ public class DrawingPanel extends JPanel {
                     tempShape = new ColoredTriangle(activeColor);
                     break;
                 case LINE:
+                    tempShape = new ColoredLine(activeColor);
                     break;
                 case OVAL:
                     break;
@@ -119,6 +120,7 @@ public class DrawingPanel extends JPanel {
                     ((ColoredTriangle) tempShape).setBounds(startPoint, e.getPoint());
                     break;
                 case LINE:
+                    ((ColoredLine) tempShape).setBounds(startPoint, e.getPoint());
                     break;
                 case OVAL:
                     break;
