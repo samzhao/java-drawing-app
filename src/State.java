@@ -54,20 +54,24 @@ public class State {
                 state = new AppState(state.getShapes(), state.getActiveColor(), activeMode, state.getActiveShapeId());
                 break;
             case ADD_SHAPE:
+                for (Object shape : shapes) {
+                    ((MyShape) shape).setInactive();
+                }
+
                 shapes.add(payload);
-                state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), ((MyShape) payload).getId());
+                state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), null);
                 break;
             case UPDATE_SHAPE:
                 if (payload == null) {
                     for (Object shape : shapes) {
                         ((MyShape) shape).setInactive();
                     }
+                    state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), null);
                     break;
                 }
 
                 MyShape payloadShape = (MyShape) payload;
                 int selectedShapeIndex = -1;
-
                 MyShape activeShape = null;
 
                 for (int i = 0; i < shapes.size(); i++) {

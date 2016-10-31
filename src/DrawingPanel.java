@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 
 /**
  * Created by samz on 2016-10-29.
- * Heavily influenced by https://tips4java.wordpress.com/2009/05/08/custom-painting-approaches/
  */
 public class DrawingPanel extends JPanel {
     State state = State.getInstance();

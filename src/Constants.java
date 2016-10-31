@@ -19,14 +19,9 @@ public class Constants {
         SET_ACTIVE_MODE,
 
         ADD_SHAPE,
-        ADD_RECT,
-        ADD_TRIG,
-        ADD_LINE,
-        ADD_OVAL,
-
         UPDATE_SHAPE,
-
         CHANGE_COLOR,
+
         DELETE_OBJECT,
     }
 

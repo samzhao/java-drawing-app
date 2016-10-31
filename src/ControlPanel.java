@@ -84,9 +84,10 @@ class ControlPanel extends JPanel implements ActionListener {
         MyShape shape = appState.getActiveShape();
         if (shape == null) return;
 
-        shape.setColor(color.getColor());
+        MyShape shapeClone = shape.clone();
+        shapeClone.setColor(color.getColor());
 
-        Event event = new Event(Constants.EVENTS.CHANGE_COLOR, shape);
+        Event event = new Event(Constants.EVENTS.UPDATE_SHAPE, shapeClone);
         state.dispatch(event);
     }
 

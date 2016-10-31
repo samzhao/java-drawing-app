@@ -35,10 +35,6 @@ public class MyShape implements Cloneable {
         isActive = false;
     }
 
-    public Shape getShape() {
-        return this.shape;
-    }
-
     public UUID getId() {
         return id;
     }
