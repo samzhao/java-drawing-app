@@ -52,7 +52,7 @@ public class ColoredFreeLine extends MyShape {
 
     public boolean contains(Point p) {
         for (Line2D line : lines) {
-            if (line.getBounds().contains(p)) {
+            if (Math.floor(line.ptSegDist(p)) < 8) {
                 return true;
             }
         }

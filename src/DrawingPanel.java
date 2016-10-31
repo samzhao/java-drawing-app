@@ -73,6 +73,7 @@ public class DrawingPanel extends JPanel {
                     tempShape = new ColoredLine(activeColor);
                     break;
                 case OVAL:
+                    tempShape = new ColoredOval(activeColor);
                     break;
                 case EDIT:
                     selectedShape = null;
@@ -123,6 +124,7 @@ public class DrawingPanel extends JPanel {
                     ((ColoredLine) tempShape).setBounds(startPoint, e.getPoint());
                     break;
                 case OVAL:
+                    ((ColoredOval) tempShape).setBounds(x, y, width, height);
                     break;
             }
             repaint();

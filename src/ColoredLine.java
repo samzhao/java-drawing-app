@@ -42,7 +42,7 @@ public class ColoredLine extends MyShape {
     }
 
     public boolean contains(Point p) {
-        return shape.getBounds().contains(p);
+        return Math.floor(shape.ptSegDist(p)) < 8;
     }
     public int getX() {
         return (int) shape.getX1();

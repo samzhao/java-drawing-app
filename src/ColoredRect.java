@@ -47,8 +47,4 @@ public class ColoredRect extends MyShape {
     public String toString() {
         return "ID: " + this.getId() + ", Background: " + this.getColor() + ", isActive: " + this.isActive();
     }
-
-    protected ColoredRect clone() {
-        return (ColoredRect) super.clone();
-    }
 }
