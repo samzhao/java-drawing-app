@@ -13,7 +13,7 @@ public class DrawingPanel extends JPanel {
     private static final int width = 600;
     private static final int height = 500;
 
-    private MyShape currentShape;
+    private MyShape tempShape;
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
@@ -41,8 +41,8 @@ public class DrawingPanel extends JPanel {
             if (shape != null) shape.draw(g);
         }
 
-        if (currentShape != null) {
-            currentShape.draw(g2d);
+        if (tempShape != null) {
+            tempShape.draw(g2d);
         }
     }
 
@@ -58,16 +58,14 @@ public class DrawingPanel extends JPanel {
 
             switch (appState.getActiveMode()) {
                 case RECT:
-                    currentShape = new ColoredRect(activeColor);
+                    tempShape = new ColoredRect(activeColor);
                     break;
                 case TRIG:
-                    currentShape = new ColoredTriangle(activeColor);
+                    tempShape = new ColoredTriangle(activeColor);
                     break;
                 case LINE:
-//                    currentShape = (Shape) new Line();
                     break;
                 case OVAL:
-//                    currentShape = (Shape) new Circle();
                     break;
                 case EDIT:
                     selectedShape = null;
@@ -106,16 +104,14 @@ public class DrawingPanel extends JPanel {
 
             switch (appState.getActiveMode()) {
                 case RECT:
-                    ((ColoredRect) currentShape).setBounds(x, y, width, height);
+                    ((ColoredRect) tempShape).setBounds(x, y, width, height);
                     break;
                 case TRIG:
-                    ((ColoredTriangle) currentShape).setBounds(startPoint, e.getPoint());
+                    ((ColoredTriangle) tempShape).setBounds(startPoint, e.getPoint());
                     break;
                 case LINE:
-//                    currentShape = (Shape) new Line();
                     break;
                 case OVAL:
-//                    currentShape = (Shape) new Circle();
                     break;
             }
             repaint();
@@ -126,11 +122,11 @@ public class DrawingPanel extends JPanel {
             int height = Math.abs(startPoint.y - e.getY());
 
             if (width == 0 || height == 0) {
-                currentShape = null;
+                tempShape = null;
                 return;
             }
 
-            if (currentShape == null) return;
+            if (tempShape == null) return;
 
             switch (appState.getActiveMode()) {
                 case RECT:
@@ -138,12 +134,12 @@ public class DrawingPanel extends JPanel {
                 case LINE:
                 case OVAL:
                 default:
-                    Event event = new Event(Constants.EVENTS.ADD_SHAPE, currentShape);
+                    Event event = new Event(Constants.EVENTS.ADD_SHAPE, tempShape);
                     state.dispatch(event);
                     break;
             }
 
-            currentShape = null;
+            tempShape = null;
         }
     }
 
