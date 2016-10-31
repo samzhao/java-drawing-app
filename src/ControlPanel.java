@@ -8,7 +8,8 @@ import java.util.ArrayList;
  * Created by samz on 2016-10-29.
  */
 class ControlPanel extends JPanel implements ActionListener {
-    AppState appState = AppState.getInstance();
+    State state = State.getInstance();
+    AppState appState = state.getState();
 
     private Color panelBg = Color.lightGray;
 
@@ -18,7 +19,7 @@ class ControlPanel extends JPanel implements ActionListener {
     MyButton resetBtn = createBtn("Reset");
 
     public ControlPanel() {
-        appState.subscribe(onStateChange());
+        state.subscribe(onStateChange());
 
         setupColorControls();
         setupModeControls();
@@ -69,12 +70,24 @@ class ControlPanel extends JPanel implements ActionListener {
     private void selectColor(Color btnBg) {
         Constants.COLORS color = Constants.COLORS.valueOf(btnBg);
         Event event = new Event(Constants.EVENTS.SET_ACTIVE_COLOR, color);
-        appState.dispatch(event);
+        state.dispatch(event);
     }
     private void selectMode(String btnText) {
         Constants.MODES mode = Constants.MODES.fromName(btnText);
         Event event = new Event(Constants.EVENTS.SET_ACTIVE_MODE, mode);
-        appState.dispatch(event);
+        state.dispatch(event);
+    }
+
+    private void changeColor(Color btnBg) {
+        Constants.COLORS color = Constants.COLORS.valueOf(btnBg);
+
+        ColoredRect rect = appState.getObjects().getActiveRect();
+        if (rect == null) return;
+
+        rect.setBackground(color.getColor());
+
+        Event event = new Event(Constants.EVENTS.CHANGE_COLOR, rect);
+        state.dispatch(event);
     }
 
     private void updateColorControls(Constants.COLORS color) {
@@ -96,10 +109,12 @@ class ControlPanel extends JPanel implements ActionListener {
         }
     }
 
-    private AppState.Subscriber onStateChange() {
-        return state -> {
-            updateColorControls((Constants.COLORS) state.get("ACTIVE_COLOR"));
-            updateModeControls((Constants.MODES) state.get("ACTIVE_MODE"));
+    private State.Subscriber onStateChange() {
+        return newState -> {
+            updateColorControls(newState.getActiveColor());
+            updateModeControls(newState.getActiveMode());
+
+            appState = newState;
         };
     }
 
@@ -109,18 +124,21 @@ class ControlPanel extends JPanel implements ActionListener {
 
         if (clickedBtn == resetBtn) {
             Event event = new Event(Constants.EVENTS.RESET_CANVAS);
-            appState.dispatch(event);
+            state.dispatch(event);
 
             return;
         }
 
         if (colorControls.contains(clickedBtn)) {
             selectColor(clickedBtn.getBackground());
-            return;
+        } else if (modeControls.contains(clickedBtn)) {
+            selectMode(clickedBtn.getText());
         }
 
-        if (modeControls.contains(clickedBtn)) {
-            selectMode(clickedBtn.getText());
+        if (appState.getActiveMode().equals(Constants.MODES.EDIT)) {
+            if (colorControls.contains(clickedBtn)) {
+                changeColor(clickedBtn.getBackground());
+            }
         }
     }
 }

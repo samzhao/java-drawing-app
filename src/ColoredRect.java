@@ -1,17 +1,15 @@
 import java.awt.*;
+import java.util.UUID;
 
 /**
  * Created by samz on 2016-10-30.
  */
 public class ColoredRect extends Rectangle {
     private Color background;
-    private Rectangle rect;
     private boolean isActive;
-    private int x;
-    private int y;
+    private UUID id = UUID.randomUUID();
 
-    public ColoredRect(Rectangle rect, Color background) {
-        this.rect = rect;
+    public ColoredRect(Color background) {
         this.background = background;
     }
 
@@ -35,15 +33,26 @@ public class ColoredRect extends Rectangle {
         return background;
     }
 
-    public void setLocation(int x, int y) {
-        rect.setLocation(x, y);
+    public UUID getId() {
+        return id;
     }
 
     public Boolean isIn(Point point) {
-        return rect.contains(point.x, point.y);
+        return this.contains(point.x, point.y);
     }
 
-    public Rectangle getRect() {
-        return rect;
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!this.getClass().equals(obj.getClass())) return false;
+
+        ColoredRect obj2 = (ColoredRect) obj;
+        if (this.id.equals(obj2.getId())) return false;
+
+        if (this.background.equals(obj2.getBackground()) && this.isActive == obj2.isActive()) return true;
+        else return false;
+    }
+
+    public String toString() {
+        return "ID: " + this.id + ", Background: " + this.background + ", isActive: " + this.isActive;
     }
 }

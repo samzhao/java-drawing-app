@@ -6,26 +6,19 @@ import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Created by samz on 2016-10-29.
  * Heavily influenced by https://tips4java.wordpress.com/2009/05/08/custom-painting-approaches/
  */
 public class DrawingPanel extends JPanel {
-    AppState appState = AppState.getInstance();
+    State state = State.getInstance();
+    AppState appState = state.getState();
 
     private static final int width = 600;
     private static final int height = 500;
 
-    private Constants.MODES currentMode;
     private Shape currentShape;
-
-    private ArrayList rects = new ArrayList();
-    private ArrayList trigs = new ArrayList();
-    private ArrayList lines = new ArrayList();
-    private ArrayList ovals = new ArrayList();
 
     public DrawingPanel() {
         setBackground(Color.WHITE);
@@ -34,7 +27,8 @@ public class DrawingPanel extends JPanel {
         addMouseListener(ml);
         addMouseMotionListener(ml);
 
-        appState.subscribe(onStateChange());
+        state.subscribe(onStateChange());
+        update(appState);
     }
 
     @Override
@@ -48,14 +42,14 @@ public class DrawingPanel extends JPanel {
 
         Color foreground = g.getColor();
         Graphics2D g2d = (Graphics2D) g;
-//
-        for (Object rect : this.rects) {
-            Rectangle r = ((ColoredRect) rect).getRect();
-            g.setColor(((ColoredRect) rect).getBackground());
+
+        for (Object rect : appState.getObjects().getRects()) {
+            ColoredRect r = ((ColoredRect) rect);
+            g.setColor(r.getBackground());
             g.drawRect(r.x, r.y, r.width, r.height);
             g.fillRect(r.x, r.y, r.width, r.height);
 
-            if (((ColoredRect) rect).isActive()) {
+            if (r.isActive()) {
                 g.setColor(Constants.SELECTION_COLOR);
                 ((Graphics2D) g).setStroke(new BasicStroke(Constants.SELECTION_STROKE_WIDTH));
                 g.drawRect(
@@ -76,23 +70,18 @@ public class DrawingPanel extends JPanel {
         }
     }
 
-    private void addRect(Rectangle rect, Color color) {
-        ColoredRect crect = new ColoredRect(rect, color);
-        Event event = new Event(Constants.EVENTS.ADD_RECT, crect);
-        appState.dispatch(event);
-        repaint();
-    }
-
     class MyMouseListener extends MouseInputAdapter {
         private Point startPoint;
         private ColoredRect selectedRect = null;
+        private int lastX;
+        private int lastY;
 
         public void mousePressed(MouseEvent e) {
             startPoint = e.getPoint();
 
-            switch (currentMode) {
+            switch (appState.getActiveMode()) {
                 case RECT:
-                    currentShape = new Rectangle();
+                    currentShape = new ColoredRect(e.getComponent().getForeground());
                     break;
                 case TRIG:
                     currentShape = (Shape) new TriangleMesh();
@@ -105,14 +94,20 @@ public class DrawingPanel extends JPanel {
                     break;
                 case EDIT:
                     selectedRect = null;
-                    for (Object rect : rects) {
+                    for (Object rect : appState.getObjects().getRects()) {
                         if (((ColoredRect) rect).isIn(startPoint)) {
-                            selectedRect = (ColoredRect) rect;
+                            selectedRect = (ColoredRect) ((ColoredRect) rect).clone();
                         }
                     }
 
-                    Event event = new Event(Constants.EVENTS.SET_ACTIVE_RECT, selectedRect);
-                    appState.dispatch(event);
+                    if (selectedRect != null) {
+                        selectedRect.setActive();
+                        lastX = selectedRect.x - e.getX();
+                        lastY = selectedRect.y - e.getY();
+                    }
+
+                    Event event = new Event(Constants.EVENTS.UPDATE_RECT, selectedRect);
+                    state.dispatch(event);
                     break;
             }
         }
@@ -123,9 +118,25 @@ public class DrawingPanel extends JPanel {
             int width = Math.abs(startPoint.x - e.getX());
             int height = Math.abs(startPoint.y - e.getY());
 
-            switch (currentMode) {
+            if (appState.getActiveMode() == Constants.MODES.EDIT) {
+                if (selectedRect == null) return;
+
+                int dx = (int) (startPoint.x - selectedRect.getX());
+                int dy = (int) (startPoint.y - selectedRect.getY());
+
+                selectedRect = (ColoredRect) selectedRect.clone();
+                Point p = new Point(e.getX() + lastX, e.getY() + lastY);
+                selectedRect.setLocation(p);
+
+                Event event = new Event(Constants.EVENTS.UPDATE_RECT, selectedRect);
+                state.dispatch(event);
+
+                return;
+            }
+
+            switch (appState.getActiveMode()) {
                 case RECT:
-                    ((Rectangle) currentShape).setBounds(x, y, width, height);
+                    ((ColoredRect) currentShape).setBounds(x, y, width, height);
                     break;
                 case TRIG:
                     currentShape = (Shape) new TriangleMesh();
@@ -136,18 +147,7 @@ public class DrawingPanel extends JPanel {
                 case OVAL:
                     currentShape = (Shape) new Circle();
                     break;
-                case EDIT:
-                    if (selectedRect == null) break;
-
-                    int dx = (int) (e.getX() - selectedRect.getRect().getX());
-                    int dy = (int) (e.getY() - selectedRect.getRect().getY());
-
-                    selectedRect.setLocation(e.getX() - dx, e.getY() - dy);
-                    Event event = new Event(Constants.EVENTS.UPDATE_RECT, selectedRect);
-                    appState.dispatch(event);
-                    break;
             }
-
             repaint();
         }
 
@@ -160,9 +160,10 @@ public class DrawingPanel extends JPanel {
                 return;
             }
 
-            switch (currentMode) {
+            switch (appState.getActiveMode()) {
                 case RECT:
-                    addRect((Rectangle) currentShape, e.getComponent().getForeground());
+                    Event event = new Event(Constants.EVENTS.ADD_RECT, currentShape);
+                    state.dispatch(event);
                     break;
                 case TRIG:
                     currentShape = (Shape) new TriangleMesh();
@@ -179,23 +180,20 @@ public class DrawingPanel extends JPanel {
         }
     }
 
-    private AppState.Subscriber onStateChange() {
-        return state -> {
-            this.setForeground(((Constants.COLORS) state.get("ACTIVE_COLOR")).getColor());
-            this.currentMode = (Constants.MODES) state.get("ACTIVE_MODE");
+    private State.Subscriber onStateChange() {
+        return newState -> {
+            if (appState.equals(newState)) return;
 
-            Map objects = (Map) state.get("OBJECTS");
-            ArrayList rects = (ArrayList) objects.get("RECTS");
-            ArrayList trigs = (ArrayList) objects.get("TRIGS");
-            ArrayList lines = (ArrayList) objects.get("LINES");
-            ArrayList ovals = (ArrayList) objects.get("OVALS");
+            System.out.println("CHANGE");
 
-            this.rects = rects;
-            this.trigs = trigs;
-            this.lines = lines;
-            this.ovals = ovals;
-
-            this.repaint();
+            update(newState);
         };
+    }
+
+    private void update(AppState newState) {
+        setForeground(newState.getActiveColor().getColor());
+        appState = newState;
+
+        this.repaint();
     }
 }

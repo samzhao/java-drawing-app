@@ -23,15 +23,13 @@ public class Constants {
         ADD_LINE,
         ADD_OVAL,
 
-        SET_ACTIVE_RECT,
-        SET_ACTIVE_TRIG,
-        SET_ACTIVE_LINE,
-        SET_ACTIVE_OVAL,
-
         UPDATE_RECT,
         UPDATE_TRIG,
         UPDATE_LINE,
         UPDATE_OVAL,
+
+        CHANGE_COLOR,
+        DELETE_OBJECT,
     }
 
     public enum MODES {
