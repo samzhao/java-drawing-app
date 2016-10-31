@@ -60,6 +60,9 @@ public class DrawingPanel extends JPanel {
             Color activeColor = appState.getActiveColor().getColor();
 
             switch (appState.getActiveMode()) {
+                case FREE:
+                    tempShape = new ColoredFreeLine(activeColor);
+                    break;
                 case RECT:
                     tempShape = new ColoredRect(activeColor);
                     break;
@@ -106,6 +109,9 @@ public class DrawingPanel extends JPanel {
             }
 
             switch (appState.getActiveMode()) {
+                case FREE:
+                    ((ColoredFreeLine) tempShape).setBounds(startPoint, e.getPoint());
+                    break;
                 case RECT:
                     ((ColoredRect) tempShape).setBounds(x, y, width, height);
                     break;
@@ -132,6 +138,7 @@ public class DrawingPanel extends JPanel {
             if (tempShape == null) return;
 
             switch (appState.getActiveMode()) {
+                case FREE:
                 case RECT:
                 case TRIG:
                 case LINE:

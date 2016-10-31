@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
  */
 public class Constants {
     public final static Color SELECTION_COLOR = new Color(63, 121, 186);
-    public final static int SELECTION_STROKE_WIDTH = 3;
+    public final static int SELECTION_STROKE_WIDTH = 5;
     public final static BasicStroke DEFAULT_STROKE = new BasicStroke(0);
+    public final static BasicStroke LINE_STROKE = new BasicStroke(5, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+    public final static BasicStroke LINE_SELECTION_STROKE = new BasicStroke(10, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     public final static BasicStroke SELECTION_STROKE = new BasicStroke(SELECTION_STROKE_WIDTH, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
 
     public enum EVENTS {
@@ -28,7 +30,7 @@ public class Constants {
     }
 
     public enum MODES {
-        FREEFORM("Free", 0),
+        FREE("Free", 0),
         RECT("Rectangle", 1),
         TRIG("Triangle", 2),
         LINE("Line", 3),

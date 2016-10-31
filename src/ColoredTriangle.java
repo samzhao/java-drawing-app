@@ -5,10 +5,10 @@ import java.awt.*;
  */
 public class ColoredTriangle extends MyShape {
     private Polygon shape;
-    Point center;
-    Point p1;
-    Point p2;
-    Point p3;
+    private Point center;
+    private Point p1;
+    private Point p2;
+    private Point p3;
 
     public ColoredTriangle(Color color) {
         super(color);
