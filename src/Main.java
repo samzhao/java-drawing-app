@@ -13,11 +13,14 @@ public class Main {
         DrawingPanel dp = new DrawingPanel();
         ControlPanel cp = new ControlPanel();
 
+        JScrollPane scrollCp = new JScrollPane(cp, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollCp.setBorder(BorderFactory.createEmptyBorder());
+
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new MyKeyEventDispatcher());
 
         container.add(dp);
-        container.add(cp, BorderLayout.NORTH);
+        container.add(scrollCp, BorderLayout.NORTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setLocationRelativeTo(null);
