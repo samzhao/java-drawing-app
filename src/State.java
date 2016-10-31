@@ -98,13 +98,9 @@ public class State {
                 state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), state.getActiveShapeId());
                 break;
             case DELETE_OBJECT:
-                System.out.println(activeShapeIndex);
-
                 if (activeShapeIndex < 0) return;
 
-                System.out.println(shapes);
                 shapes.remove(activeShapeIndex);
-                System.out.println(shapes);
 
                 state = new AppState(shapes, state.getActiveColor(), state.getActiveMode(), state.getActiveShapeId());
                 break;

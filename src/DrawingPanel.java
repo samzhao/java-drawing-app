@@ -38,7 +38,7 @@ public class DrawingPanel extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         for (MyShape shape : appState.getShapes()) {
-            shape.draw(g);
+            if (shape != null) shape.draw(g);
         }
 
         if (currentShape != null) {
@@ -48,19 +48,20 @@ public class DrawingPanel extends JPanel {
 
     class MyMouseListener extends MouseInputAdapter {
         private Point startPoint;
-        private MyShape selectedRect = null;
+        private MyShape selectedShape = null;
         private int lastX;
         private int lastY;
 
         public void mousePressed(MouseEvent e) {
             startPoint = e.getPoint();
+            Color activeColor = appState.getActiveColor().getColor();
 
             switch (appState.getActiveMode()) {
                 case RECT:
-                    currentShape = new ColoredRect(appState.getActiveColor().getColor());
+                    currentShape = new ColoredRect(activeColor);
                     break;
                 case TRIG:
-//                    currentShape = (Shape) new TriangleMesh();
+                    currentShape = new ColoredTriangle(activeColor);
                     break;
                 case LINE:
 //                    currentShape = (Shape) new Line();
@@ -69,16 +70,16 @@ public class DrawingPanel extends JPanel {
 //                    currentShape = (Shape) new Circle();
                     break;
                 case EDIT:
-                    selectedRect = null;
-                    appState.getShapes().stream().filter(shape -> shape.contains(startPoint)).forEach(shape -> selectedRect = shape.clone());
+                    selectedShape = null;
+                    appState.getShapes().stream().filter(shape -> shape.contains(startPoint)).forEach(shape -> selectedShape = shape.clone());
 
-                    if (selectedRect != null) {
-                        selectedRect.setActive();
-                        lastX = selectedRect.getX() - e.getX();
-                        lastY = selectedRect.getY() - e.getY();
+                    if (selectedShape != null) {
+                        selectedShape.setActive();
+                        lastX = selectedShape.getX() - e.getX();
+                        lastY = selectedShape.getY() - e.getY();
                     }
 
-                    Event event = new Event(Constants.EVENTS.UPDATE_SHAPE, selectedRect);
+                    Event event = new Event(Constants.EVENTS.UPDATE_SHAPE, selectedShape);
                     state.dispatch(event);
                     break;
             }
@@ -91,13 +92,13 @@ public class DrawingPanel extends JPanel {
             int height = Math.abs(startPoint.y - e.getY());
 
             if (appState.getActiveMode() == Constants.MODES.EDIT) {
-                if (selectedRect == null) return;
+                if (selectedShape == null) return;
 
-                selectedRect = selectedRect.clone();
+                selectedShape = selectedShape.clone();
                 Point p = new Point(e.getX() + lastX, e.getY() + lastY);
-                selectedRect.setLocation(p);
+                selectedShape.setLocation(p);
 
-                Event event = new Event(Constants.EVENTS.UPDATE_SHAPE, selectedRect);
+                Event event = new Event(Constants.EVENTS.UPDATE_SHAPE, selectedShape);
                 state.dispatch(event);
 
                 return;
@@ -108,7 +109,7 @@ public class DrawingPanel extends JPanel {
                     ((ColoredRect) currentShape).setBounds(x, y, width, height);
                     break;
                 case TRIG:
-//                    currentShape = (Shape) new TriangleMesh();
+                    ((ColoredTriangle) currentShape).setBounds(startPoint, e.getPoint());
                     break;
                 case LINE:
 //                    currentShape = (Shape) new Line();
@@ -129,19 +130,16 @@ public class DrawingPanel extends JPanel {
                 return;
             }
 
+            if (currentShape == null) return;
+
             switch (appState.getActiveMode()) {
                 case RECT:
+                case TRIG:
+                case LINE:
+                case OVAL:
+                default:
                     Event event = new Event(Constants.EVENTS.ADD_SHAPE, currentShape);
                     state.dispatch(event);
-                    break;
-                case TRIG:
-//                    currentShape = (Shape) new TriangleMesh();
-                    break;
-                case LINE:
-//                    currentShape = (Shape) new Line();
-                    break;
-                case OVAL:
-//                    currentShape = (Shape) new Circle();
                     break;
             }
 

@@ -11,16 +11,6 @@ public class ColoredRect extends MyShape {
         shape = new Rectangle();
     }
 
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!this.getClass().equals(obj.getClass())) return false;
-
-        ColoredRect obj2 = (ColoredRect) obj;
-        if (this.getId().equals(obj2.getId())) return false;
-
-        return this.getColor().equals(obj2.getColor()) && this.isActive() == obj2.isActive();
-    }
-
     public void draw(Graphics g) {
         super.draw(g);
 
@@ -32,12 +22,7 @@ public class ColoredRect extends MyShape {
         if (isActive()) {
             g.setColor(Constants.SELECTION_COLOR);
             ((Graphics2D) g).setStroke(new BasicStroke(Constants.SELECTION_STROKE_WIDTH));
-            g.drawRect(
-                    shape.x-Constants.SELECTION_STROKE_WIDTH,
-                    shape.y-Constants.SELECTION_STROKE_WIDTH,
-                    shape.width+Constants.SELECTION_STROKE_WIDTH*2,
-                    shape.height+Constants.SELECTION_STROKE_WIDTH*2
-            );
+            g.drawRect(shape.x, shape.y, shape.width, shape.height);
             ((Graphics2D) g).setStroke(new BasicStroke(1));
         }
     }

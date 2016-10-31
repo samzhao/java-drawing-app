@@ -14,4 +14,8 @@ public class Event {
         this.type = type;
         this.payload = payload;
     }
+
+    public String toString() {
+        return ""+this.type+this.payload;
+    }
 }

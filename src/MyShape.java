@@ -58,6 +58,16 @@ public class MyShape implements Cloneable {
 
     public void setLocation(Point p) {}
 
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!this.getClass().equals(obj.getClass())) return false;
+
+        MyShape obj2 = (MyShape) obj;
+        if (this.getId().equals(obj2.getId())) return false;
+
+        return this.getColor().equals(obj2.getColor()) && this.isActive() == obj2.isActive();
+    }
+
     @Override
     protected MyShape clone() {
         try {
