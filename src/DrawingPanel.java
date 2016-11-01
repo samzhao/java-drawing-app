@@ -150,6 +150,9 @@ public class DrawingPanel extends JPanel {
                 default:
                     Event event = new Event(Constants.EVENTS.ADD_SHAPE, tempShape);
                     state.dispatch(event);
+
+                    Event event1 = new Event(Constants.EVENTS.SET_ACTIVE_MODE, Constants.MODES.EDIT);
+                    state.dispatch(event1);
                     break;
             }
 
